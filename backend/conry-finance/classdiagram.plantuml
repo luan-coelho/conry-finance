@@ -1,0 +1,42 @@
+@startuml
+
+class CardItem {
+    - id: Long
+    - description: String
+    - amount: String
+    - eventDateTime: String
+}
+
+class Card {
+    - id: Long
+    - description: String,
+    - amount: BigDecimal,
+}
+
+enum CardType {
+    + DEFAULT,
+    + TOTAL_AMOUNT_SPENT,
+    + TOTAL_AVAILABLE
+}
+
+class MonthlyBudget {
+    - id: Long
+    - period: LocalDate
+}
+
+class User {
+    - id: Long
+    - firstName: String
+    - lastName: String
+    - email: String
+    - password: String
+}
+
+'Entity relationships
+
+User "1" --> "*" MonthlyBudget
+Card "1" *-right-> "*" CardItem
+Card "1" *-left-> "*" CardType
+MonthlyBudget "1" --> "*" Card
+
+@enduml
