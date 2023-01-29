@@ -1,7 +1,7 @@
 package br.com.conry.domain.repository.monthlybudget;
 
 import br.com.conry.domain.model.monthlybudget.Card;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface CardRepository extends JpaRepository<Card, Long> {
+public interface CardRepository extends CrudRepository<Card, Long> {
 }

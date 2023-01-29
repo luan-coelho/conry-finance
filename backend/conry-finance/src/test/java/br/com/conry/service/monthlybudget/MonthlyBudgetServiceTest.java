@@ -2,6 +2,7 @@ package br.com.conry.service.monthlybudget;
 
 import br.com.conry.domain.model.monthlybudget.MonthlyBudget;
 import br.com.conry.domain.repository.MonthlyBudgetRepository;
+import br.com.conry.rest.dto.card.CardCreateDTO;
 import br.com.conry.rest.dto.monthlybudget.MonthlyBudgetCreateDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,21 +89,21 @@ class MonthlyBudgetServiceTest {
         Long id = monthlyBudgetService.create(monthlyBudgetCreateDTO).getId();
 
         // Act
-        MonthlyBudget monthlyBudgetCreated = monthlyBudgetService.changeDescription(id, "New description");
-        boolean exists = monthlyBudgetRepository.existsById(monthlyBudgetCreated.getId());
+        MonthlyBudget monthlyBudgetUpdated = monthlyBudgetService.changeDescription(id, "New description");
+        boolean exists = monthlyBudgetRepository.existsById(monthlyBudgetUpdated.getId());
 
         // Assert
-        Assertions.assertThat(monthlyBudgetCreated.getDescription()).isEqualTo("New description");
+        Assertions.assertThat(monthlyBudgetUpdated.getDescription()).isEqualTo("New description");
         Assertions.assertThat(exists).isTrue();
-        Assertions.assertThat(monthlyBudgetCreated.getChangeDate()).isNotNull();
-        Assertions.assertThat(monthlyBudgetCreated.getChangeDate().isAfter(monthlyBudgetCreated.getCreationDate())).isTrue();
+        Assertions.assertThat(monthlyBudgetUpdated.getChangeDate()).isNotNull();
+        Assertions.assertThat(monthlyBudgetUpdated.getChangeDate().isAfter(monthlyBudgetUpdated.getCreationDate())).isTrue();
     }
 
     @Transactional
     @Test
     @DisplayName("Checks if the monthly budget was successfully deleted from the database")
     void testDelete_CheckIfMonthlyBudgetIsDeleted_Void() {
-        //Arrange
+        // Arrange
         MonthlyBudget monthlyBudget = monthlyBudgetService.create(monthlyBudgetCreateDTO);
         Long monthlyBudgetId = monthlyBudget.getId();
 
@@ -112,5 +113,21 @@ class MonthlyBudgetServiceTest {
 
         // Assert
         Assertions.assertThat(exists).isFalse();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Test
+    @DisplayName("Checks if new card is being added to the monthly budget")
+    void testAddCard_WhenNewCardIsAdded_thenReturnTheMonthlyBudget() {
+        // Arrange
+        CardCreateDTO cardCreateDTO = new CardCreateDTO("New Card");
+        MonthlyBudget monthlyBudget = monthlyBudgetService.create(monthlyBudgetCreateDTO);
+
+        // Act
+        MonthlyBudget monthlyBudgetWithNewCard = monthlyBudgetService.addCard(monthlyBudget.getId(), cardCreateDTO);
+
+        // Assert
+        Assertions.assertThat(monthlyBudgetWithNewCard.getCards().size()).isEqualTo(4);
+        Assertions.assertThat(monthlyBudgetWithNewCard.getCards().get(3).getDescription()).isEqualTo("New Card");
     }
 }

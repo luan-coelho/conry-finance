@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -23,6 +24,6 @@ public class MonthlyBudget extends DefaultEntity {
     private Long id;
     private String description;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Card> cards;
+    private List<Card> cards = new ArrayList<>();
     private LocalDate period = LocalDate.now();
 }

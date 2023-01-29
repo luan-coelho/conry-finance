@@ -4,6 +4,8 @@ import br.com.conry.domain.model.enums.CardType;
 import br.com.conry.domain.model.monthlybudget.Card;
 import br.com.conry.domain.model.monthlybudget.MonthlyBudget;
 import br.com.conry.domain.repository.MonthlyBudgetRepository;
+import br.com.conry.domain.repository.monthlybudget.CardRepository;
+import br.com.conry.rest.dto.card.CardCreateDTO;
 import br.com.conry.rest.dto.monthlybudget.MonthlyBudgetCreateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,9 +26,11 @@ import java.util.List;
 public class MonthlyBudgetService {
 
     private final MonthlyBudgetRepository monthlyBudgetRepository;
+    private final CardRepository cardRepository;
 
     /**
      * Responsible for creating and persisting a monthly budget in the database
+     *
      * @param monthlyBudget Monthly budget with description and period informed by the customer
      * @return Monthly budget persisted in the database
      */
@@ -40,13 +46,15 @@ public class MonthlyBudgetService {
 
     /**
      * Responsible for changing the description of a monthly budget
-     * @param id Monthly budget identifier
+     *
+     * @param id          Monthly budget identifier
      * @param description New monthly budget description
      * @return Monthly budget with updated description
      */
     @Transactional
     public MonthlyBudget changeDescription(Long id, String description) {
-        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
         monthlyBudget.setDescription(description);
 
         return monthlyBudgetRepository.save(monthlyBudget);
@@ -54,8 +62,9 @@ public class MonthlyBudgetService {
 
     /**
      * Create a default monthly budget instance
+     *
      * @param description Montly budget description
-     * @param period Monthly budget period
+     * @param period      Monthly budget period
      * @return Standard monthly budget instance
      */
     private MonthlyBudget createDefaultInstance(String description, LocalDate period) {
@@ -79,22 +88,38 @@ public class MonthlyBudgetService {
                 .cardType(CardType.TOTAL_AVAILABLE)
                 .build();
 
+
         return MonthlyBudget.builder()
                 .description(description)
                 .period(period)
-                .cards(List.of(defaultCard, totalAmountCard, totalAvailable))
+                .cards(new ArrayList<>(Arrays.asList(defaultCard, totalAmountCard, totalAvailable)))
                 .build();
     }
 
     /**
      * Deletes a monthly budget from the database
+     *
      * @param id Monthly budget identifier
      */
     @Transactional
-    public void delete(Long id){
-        if(!monthlyBudgetRepository.existsById(id)){
+    public void delete(Long id) {
+        if (!monthlyBudgetRepository.existsById(id)) {
             throw new IllegalArgumentException("Monthly budget not found by id");
         }
         monthlyBudgetRepository.deleteById(id);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public MonthlyBudget addCard(Long id, CardCreateDTO cardCreateDTO) {
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
+
+        Card newCard = new Card();
+        newCard.setDescription(cardCreateDTO.getDescription());
+
+        List<Card> cards = monthlyBudget.getCards();
+        cards.add(newCard);
+
+        return monthlyBudgetRepository.save(monthlyBudget);
     }
 }
