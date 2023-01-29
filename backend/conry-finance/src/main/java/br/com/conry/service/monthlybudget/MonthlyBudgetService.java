@@ -81,4 +81,15 @@ public class MonthlyBudgetService {
                 .cards(List.of(defaultCard, totalAmountCard, totalAvailable))
                 .build();
     }
+
+    /**
+     * Deletes a monthly budget from the database
+     * @param id Monthly budget identifier
+     */
+    public void delete(Long id){
+        if(!monthlyBudgetRepository.existsById(id)){
+            throw new IllegalArgumentException("Monthly budget not found by id");
+        }
+        monthlyBudgetRepository.deleteById(id);
+    }
 }
