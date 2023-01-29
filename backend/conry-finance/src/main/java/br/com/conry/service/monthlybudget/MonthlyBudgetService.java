@@ -7,6 +7,8 @@ import br.com.conry.domain.repository.MonthlyBudgetRepository;
 import br.com.conry.rest.dto.monthlybudget.MonthlyBudgetCreateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ public class MonthlyBudgetService {
      * @param monthlyBudget Monthly budget with description and period informed by the customer
      * @return Monthly budget persisted in the database
      */
+    @Transactional
     public MonthlyBudget create(MonthlyBudgetCreateDTO monthlyBudget) {
         if (monthlyBudgetRepository.existsByDescriptionEqualsIgnoreCase(monthlyBudget.getDescription())) { // Checks if there is already a monthly budget with the name entered
             throw new IllegalArgumentException("There is already an monthly budget registered with this name");
@@ -41,6 +44,7 @@ public class MonthlyBudgetService {
      * @param description New monthly budget description
      * @return Monthly budget with updated description
      */
+    @Transactional
     public MonthlyBudget changeDescription(Long id, String description) {
         MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
         monthlyBudget.setDescription(description);
@@ -86,6 +90,7 @@ public class MonthlyBudgetService {
      * Deletes a monthly budget from the database
      * @param id Monthly budget identifier
      */
+    @Transactional
     public void delete(Long id){
         if(!monthlyBudgetRepository.existsById(id)){
             throw new IllegalArgumentException("Monthly budget not found by id");

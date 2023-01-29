@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -48,10 +49,18 @@ class MonthlyBudgetServiceTest {
     @Test
     @DisplayName("Checks if monthly budget was successfully created and persisted")
     void testCreate_whenValidInput_thenReturnCreatedMontlyBudget() {
+        // Arrange
         MonthlyBudget monthlyBudgetCreated = monthlyBudgetService.create(monthlyBudgetCreateDTO);
+
+        // Act
         boolean exists = monthlyBudgetRepository.existsById(monthlyBudgetCreated.getId());
 
         Assertions.assertThat(exists).isTrue();
+        Assertions.assertThat(monthlyBudgetCreated.getId()).isNotNull();
+        Assertions.assertThat(monthlyBudgetCreated.getDescription()).isEqualTo("Test");
+        Assertions.assertThat(monthlyBudgetCreated.getPeriod()).isEqualTo(LocalDate.now());
+        Assertions.assertThat(monthlyBudgetCreated.getCards()).isNotEmpty();
+        Assertions.assertThat(monthlyBudgetCreated.getVersion()).isEqualTo(0);
     }
 
     @Transactional
@@ -60,31 +69,48 @@ class MonthlyBudgetServiceTest {
     void testCreate_whenEnterDescriptionOfAnotherMonthlyBudget_thenReturnIllegalArgumentException() {
         monthlyBudgetService.create(monthlyBudgetCreateDTO);
 
-        assertThatThrownBy(() -> {
-            monthlyBudgetService.create(monthlyBudgetCreateDTO);
-        }).isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> monthlyBudgetService.create(monthlyBudgetCreateDTO))
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("There is already an monthly budget registered with this name");
     }
 
-    @Transactional
+    /**
+     * Transactional(propagation = Propagation.SUPPORTS)
+     * A new transaction is always created, regardless of whether there is an active transaction.
+     * The current transaction becomes the active transaction and the previous transaction is suspended.
+     */
+
+    @Transactional(propagation = Propagation.SUPPORTS) //
     @Test
     @DisplayName("Checks if the monthly budget description was successfully changed")
     void testChangeDescription_ChecksIfTheDescriptionWasChanged_() {
-        MonthlyBudget monthlyBudgetCreated = monthlyBudgetService.changeDescription(1L, "Test");
+        // Arrange
+        Long id = monthlyBudgetService.create(monthlyBudgetCreateDTO).getId();
+
+        // Act
+        MonthlyBudget monthlyBudgetCreated = monthlyBudgetService.changeDescription(id, "New description");
         boolean exists = monthlyBudgetRepository.existsById(monthlyBudgetCreated.getId());
 
+        // Assert
+        Assertions.assertThat(monthlyBudgetCreated.getDescription()).isEqualTo("New description");
         Assertions.assertThat(exists).isTrue();
+        Assertions.assertThat(monthlyBudgetCreated.getChangeDate()).isNotNull();
+        Assertions.assertThat(monthlyBudgetCreated.getChangeDate().isAfter(monthlyBudgetCreated.getCreationDate())).isTrue();
     }
 
     @Transactional
     @Test
     @DisplayName("Checks if the monthly budget was successfully deleted from the database")
     void testDelete_CheckIfMonthlyBudgetIsDeleted_Void() {
+        //Arrange
         MonthlyBudget monthlyBudget = monthlyBudgetService.create(monthlyBudgetCreateDTO);
         Long monthlyBudgetId = monthlyBudget.getId();
+
+        // Act
         monthlyBudgetService.delete(monthlyBudgetId);
         boolean exists = monthlyBudgetRepository.existsById(monthlyBudgetId);
 
+        // Assert
         Assertions.assertThat(exists).isFalse();
     }
 }
