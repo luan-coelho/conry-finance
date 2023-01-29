@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Service responsible for the monthly budget business rule
+ */
 @RequiredArgsConstructor
 @Service
 public class MonthlyBudgetService {
@@ -27,7 +30,7 @@ public class MonthlyBudgetService {
         if (monthlyBudgetRepository.existsByDescriptionEqualsIgnoreCase(monthlyBudget.getDescription())) { // Checks if there is already a monthly budget with the name entered
             throw new IllegalArgumentException("There is already an monthly budget registered with this name");
         }
-        MonthlyBudget monthlyBudgetPersisted = createDefaultMonthlyBudget(monthlyBudget.getDescription(), monthlyBudget.getPeriod());
+        MonthlyBudget monthlyBudgetPersisted = createDefaultInstance(monthlyBudget.getDescription(), monthlyBudget.getPeriod());
 
         return monthlyBudgetRepository.save(monthlyBudgetPersisted);
     }
@@ -46,13 +49,13 @@ public class MonthlyBudgetService {
     }
 
     /**
-     *
-     * @param description
-     * @param period
-     * @return
+     * Create a default monthly budget instance
+     * @param description Montly budget description
+     * @param period Monthly budget period
+     * @return Standard monthly budget instance
      */
-    private MonthlyBudget createDefaultMonthlyBudget(String description, LocalDate period) {
-        BigDecimal amount = new BigDecimal("0.00");
+    private MonthlyBudget createDefaultInstance(String description, LocalDate period) {
+        final BigDecimal amount = new BigDecimal("0.00");
 
         Card defaultCard = Card.builder()
                 .description("Description")
