@@ -23,7 +23,7 @@ public class Card {
     private Long id;
     private String description;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<CardItem> valueCards = new LinkedList<>();
+    private List<CardItem> cardItems = new LinkedList<>();
     private BigDecimal amount = new BigDecimal(0);
     private CardType cardType = CardType.DEFAULT;
 }

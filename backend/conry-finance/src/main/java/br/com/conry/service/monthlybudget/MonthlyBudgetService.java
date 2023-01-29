@@ -1,5 +1,6 @@
 package br.com.conry.service.monthlybudget;
 
+import br.com.conry.commons.MontlyBudgetComponents;
 import br.com.conry.domain.model.enums.CardType;
 import br.com.conry.domain.model.monthlybudget.Card;
 import br.com.conry.domain.model.monthlybudget.MonthlyBudget;
@@ -9,7 +10,6 @@ import br.com.conry.rest.dto.card.CardCreateDTO;
 import br.com.conry.rest.dto.monthlybudget.MonthlyBudgetCreateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -53,8 +53,7 @@ public class MonthlyBudgetService {
      */
     @Transactional
     public MonthlyBudget changeDescription(Long id, String description) {
-        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
         monthlyBudget.setDescription(description);
 
         return monthlyBudgetRepository.save(monthlyBudget);
@@ -68,32 +67,13 @@ public class MonthlyBudgetService {
      * @return Standard monthly budget instance
      */
     private MonthlyBudget createDefaultInstance(String description, LocalDate period) {
-        final BigDecimal amount = new BigDecimal("0.00");
+        final BigDecimal AMOUNT = new BigDecimal("0.00");
 
-        Card defaultCard = Card.builder()
-                .description("Description")
-                .amount(amount)
-                .cardType(CardType.DEFAULT)
-                .build();
+        Card defaultCard = Card.builder().description("Description").amount(AMOUNT).cardType(CardType.DEFAULT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildDefaultCardItem()))).build();
+        Card totalAmountCard = Card.builder().description("Total amount").amount(AMOUNT).cardType(CardType.TOTAL_AMOUNT_SPENT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildDefaultCardItem()))).build();
+        Card totalAvailable = Card.builder().description("Total available").amount(AMOUNT).cardType(CardType.TOTAL_AVAILABLE).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildDefaultCardItem()))).build();
 
-        Card totalAmountCard = Card.builder()
-                .description("Total amount")
-                .amount(amount)
-                .cardType(CardType.TOTAL_AMOUNT_SPENT)
-                .build();
-
-        Card totalAvailable = Card.builder()
-                .description("Total available")
-                .amount(amount)
-                .cardType(CardType.TOTAL_AVAILABLE)
-                .build();
-
-
-        return MonthlyBudget.builder()
-                .description(description)
-                .period(period)
-                .cards(new ArrayList<>(Arrays.asList(defaultCard, totalAmountCard, totalAvailable)))
-                .build();
+        return MonthlyBudget.builder().description(description).period(period).cards(new ArrayList<>(Arrays.asList(defaultCard, totalAmountCard, totalAvailable))).build();
     }
 
     /**
@@ -109,16 +89,19 @@ public class MonthlyBudgetService {
         monthlyBudgetRepository.deleteById(id);
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
-    public MonthlyBudget addCard(Long id, CardCreateDTO cardCreateDTO) {
-        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
+    /**
+     * Adds a card to the monthly budget
+     *
+     * @param monthlyBudgetId Monthly budget identifier
+     * @param cardCreateDTO   DTO with input data
+     * @return Montly budget updated
+     */
+    @Transactional
+    public MonthlyBudget addCard(Long monthlyBudgetId, CardCreateDTO cardCreateDTO) {
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(monthlyBudgetId).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
 
-        Card newCard = new Card();
-        newCard.setDescription(cardCreateDTO.getDescription());
-
-        List<Card> cards = monthlyBudget.getCards();
-        cards.add(newCard);
+        Card newCard = MontlyBudgetComponents.buildCard(cardCreateDTO.getDescription());
+        monthlyBudget.getCards().add(newCard);
 
         return monthlyBudgetRepository.save(monthlyBudget);
     }
