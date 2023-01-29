@@ -13,7 +13,7 @@ import java.util.Objects;
 public class MouthlyBudgetConstants {
 
     public static final MonthlyBudget MONTHLY_BUDGET = createDefaultMonthlyBudget("description", LocalDate.now());
-    public static final MonthlyBudget MONTHLY_BUDGET_CREATED = persisted(null);
+    public static final MonthlyBudget MONTHLY_BUDGET_PERSISTED = persisted(null);
     public static final MonthlyBudget MONTHLY_BUDGET_BEFORE_UPDATED = decriptionBeforeChanged();
     public static final MonthlyBudget MONTHLY_BUDGET_AFTER_UPDATED = decriptionAfterChanged();
 
