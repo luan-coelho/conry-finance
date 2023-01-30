@@ -69,9 +69,9 @@ public class MonthlyBudgetService {
     private MonthlyBudget createDefaultInstance(String description, LocalDate period) {
         final BigDecimal AMOUNT = new BigDecimal("0.00");
 
-        Card defaultCard = Card.builder().description("Description").amount(AMOUNT).cardType(CardType.DEFAULT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildDefaultCardItem()))).build();
-        Card totalAmountCard = Card.builder().description("Total amount").amount(AMOUNT).cardType(CardType.TOTAL_AMOUNT_SPENT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildDefaultCardItem()))).build();
-        Card totalAvailable = Card.builder().description("Total available").amount(AMOUNT).cardType(CardType.TOTAL_AVAILABLE).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildDefaultCardItem()))).build();
+        Card defaultCard = Card.builder().description("Description").amount(AMOUNT).cardType(CardType.DEFAULT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildCardItem()))).build();
+        Card totalAmountCard = Card.builder().description("Total amount").amount(AMOUNT).cardType(CardType.TOTAL_AMOUNT_SPENT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildCardItem()))).build();
+        Card totalAvailable = Card.builder().description("Total available").amount(AMOUNT).cardType(CardType.TOTAL_AVAILABLE).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildCardItem()))).build();
 
         return MonthlyBudget.builder().description(description).period(period).cards(new ArrayList<>(Arrays.asList(defaultCard, totalAmountCard, totalAvailable))).build();
     }

@@ -20,7 +20,7 @@ public class MontlyBudgetComponents {
     public static Card buildCard(String description) {
         Card newCard = new Card();
         newCard.setDescription(description);
-        newCard.getCardItems().add(buildDefaultCardItem());
+        newCard.getCardItems().add(buildCardItem("Description"));
 
         return newCard;
     }
@@ -30,7 +30,7 @@ public class MontlyBudgetComponents {
      *
      * @return Default card item
      */
-    public static CardItem buildDefaultCardItem() {
-        return new CardItem(null, "Description", new BigDecimal("0"), LocalDateTime.now());
+    public static CardItem buildCardItem(String description) {
+        return new CardItem(null, description, new BigDecimal("0"), LocalDateTime.now());
     }
 }
