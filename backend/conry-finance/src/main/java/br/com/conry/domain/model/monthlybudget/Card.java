@@ -18,12 +18,19 @@ import java.util.List;
 public class Card {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "card_seq")
-    @SequenceGenerator(name = "card_seq", sequenceName = "card_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CARD_SEQ")
+    @SequenceGenerator(name = "CARD_SEQ", sequenceName = "CARD_SEQ", allocationSize = 1)
     private Long id;
     private String description;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CardItem> cardItems = new LinkedList<>();
     private BigDecimal amount = new BigDecimal(0);
     private CardType cardType = CardType.DEFAULT;
+
+    public void addItem(CardItem cardItem) {
+        if (this.cardItems == null) {
+            return;
+        }
+        this.cardItems.add(cardItem);
+    }
 }
