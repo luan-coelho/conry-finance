@@ -32,11 +32,26 @@ class User {
     - password: String
 }
 
+class Log {
+    - id: Long
+    - details: String
+    - userIdentifier: Long
+}
+
+enum LogType {
+    + ERROR
+    + WARNING
+    + SUCCESS
+    + INFO
+}
+
 'Entity relationships
 
 User "1" --> "*" MonthlyBudget
 Card "1" *-right-> "*" CardItem
 Card "1" *-left-> "*" CardType
 MonthlyBudget "1" --> "*" Card
+
+Log "*" o-> "1" LogType
 
 @enduml
