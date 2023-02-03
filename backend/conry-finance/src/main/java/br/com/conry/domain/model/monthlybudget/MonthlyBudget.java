@@ -19,8 +19,8 @@ import java.util.List;
 public class MonthlyBudget extends DefaultEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "monthlybudget_seq")
-    @SequenceGenerator(name = "monthlybudget_seq", sequenceName = "monthlybudget_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MONTHLYBUDGET_SEQ")
+    @SequenceGenerator(name = "MONTHLYBUDGET_SEQ", sequenceName = "MONTHLYBUDGET_SEQ", allocationSize = 1)
     private Long id;
     private String description;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

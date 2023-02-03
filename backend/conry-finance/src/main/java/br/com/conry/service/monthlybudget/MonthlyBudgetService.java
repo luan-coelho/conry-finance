@@ -73,7 +73,9 @@ public class MonthlyBudgetService {
         Card totalAmountCard = Card.builder().description("Total amount").amount(AMOUNT).cardType(CardType.TOTAL_AMOUNT_SPENT).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildCardItem("Description")))).build();
         Card totalAvailable = Card.builder().description("Total available").amount(AMOUNT).cardType(CardType.TOTAL_AVAILABLE).cardItems(new ArrayList<>(List.of(MontlyBudgetComponents.buildCardItem("Description")))).build();
 
-        return MonthlyBudget.builder().description(description).period(period).cards(new ArrayList<>(Arrays.asList(defaultCard, totalAmountCard, totalAvailable))).build();
+        ArrayList<Card> cards = new ArrayList<>(Arrays.asList(defaultCard, totalAmountCard, totalAvailable));
+
+        return MonthlyBudget.builder().description(description).period(period).cards(cards).build();
     }
 
     /**
@@ -104,5 +106,18 @@ public class MonthlyBudgetService {
         monthlyBudget.getCards().add(newCard);
 
         return monthlyBudgetRepository.save(monthlyBudget);
+    }
+
+    /**
+     * Remove an item from a card
+     *
+     * @param cardItemId Card item identifier
+     */
+    @Transactional
+    public void removeCard(Long cardItemId) {
+        if (!cardRepository.existsById(cardItemId)) {
+            throw new IllegalArgumentException("Card item not found by id");
+        }
+        monthlyBudgetRepository.deleteById(cardItemId);
     }
 }
