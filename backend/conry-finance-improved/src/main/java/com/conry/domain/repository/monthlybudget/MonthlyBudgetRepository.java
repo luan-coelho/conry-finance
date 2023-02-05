@@ -16,6 +16,6 @@ public class MonthlyBudgetRepository implements PanacheRepository<MonthlyBudget>
     }
 
     public boolean existsByDescriptionEqualsIgnoreCase(String description) {
-        return count("description LIKE ?1", description) > 1;
+        return count("description LIKE ?1", description) > 0;
     }
 }

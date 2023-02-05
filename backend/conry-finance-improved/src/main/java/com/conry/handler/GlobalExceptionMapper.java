@@ -22,10 +22,10 @@ public class GlobalExceptionMapper {
     @ServerExceptionMapper
     public RestResponse<ErrorResponse> mapException(Throwable exception) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .type(new URI("https://example.com/problems/validation-error"))
+                .type(new URI(""))
                 .title("Internal Server Error")
                 .detail(exception.getMessage())
-                .instance(new URI(request.uri()))
+                .instance(new URI(request.absoluteURI()))
                 .status(RestResponse.StatusCode.INTERNAL_SERVER_ERROR)
                 .build();
 
@@ -36,10 +36,10 @@ public class GlobalExceptionMapper {
     @ServerExceptionMapper
     public RestResponse<ErrorResponse> mapException(IllegalArgumentException exception) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .type(new URI("https://example.com/problems/bad-request"))
+                .type(new URI(""))
                 .title("Validation Error")
                 .detail(exception.getMessage())
-                .instance(new URI(request.uri()))
+                .instance(new URI(request.absoluteURI()))
                 .status(RestResponse.StatusCode.BAD_REQUEST)
                 .build();
 
