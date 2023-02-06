@@ -1,12 +1,14 @@
 package com.conry.service.monthlybudget;
 
 import com.conry.commons.MontlyBudgetComponents;
+import com.conry.commons.Pagination;
 import com.conry.domain.model.monthlybudget.Card;
 import com.conry.domain.model.monthlybudget.MonthlyBudget;
 import com.conry.domain.repository.monthlybudget.CardRepository;
 import com.conry.domain.repository.monthlybudget.MonthlyBudgetRepository;
 import com.conry.rest.dto.card.CardCreateDTO;
 import com.conry.rest.dto.monthlybudget.MonthlyBudgetCreateDTO;
+import com.conry.rest.dto.pagination.Pageable;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,6 +24,20 @@ public class MonthlyBudgetService {
 
     @Inject
     CardRepository cardRepository;
+
+    /**
+     * Returns the montly from its id
+     *
+     * @param montlyBudgetId Monthly budget identifier
+     * @return Montly budget
+     */
+    public MonthlyBudget findById(Long montlyBudgetId) {
+        return monthlyBudgetRepository.findByIdOptional(montlyBudgetId).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
+    }
+
+    public Pagination<MonthlyBudget> findAll(Pageable pageable) {
+        return monthlyBudgetRepository.listAllPaginated(pageable);
+    }
 
     /**
      * Responsible for creating and persisting a monthly budget in the database
@@ -43,12 +59,12 @@ public class MonthlyBudgetService {
     /**
      * Responsible for changing the description of a monthly budget
      *
-     * @param id          Monthly budget identifier
-     * @param description New monthly budget description
+     * @param montlyBudgetId Monthly budget identifier
+     * @param description    New monthly budget description
      * @return Monthly budget with updated description
      */
-    public MonthlyBudget changeDescription(Long id, String description) {
-        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findByIdOptional(id).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
+    public MonthlyBudget changeDescription(Long montlyBudgetId, String description) {
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findByIdOptional(montlyBudgetId).orElseThrow(() -> new IllegalArgumentException("Monthly budget not found by id"));
         monthlyBudget.setDescription(description);
 
         monthlyBudgetRepository.persist(monthlyBudget);
